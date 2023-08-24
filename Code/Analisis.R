@@ -22,8 +22,8 @@ source("code/ress_descarga.R")
 # Análisis ------------------------------------------------------------------------------------------------
 
 df_raw <- ress_raw %>%
-  select(ano, mes, provincia, edad, sueldo , dias, genero, ciiu4_1, tamano_empleo) %>% 
-  filter(provincia %in% seq(1:24), sueldo>0) %>%
+  select(ano, mes, provincia, edad, sueldo , est_civil_rc, genero, ciiu4_1, tamano_empleo) %>% 
+  filter(provincia %in% seq(1:24), sueldo>0, est_civil_rc %in% c(1,2)) %>%
   mutate(Sexo = factor(genero, levels = c(1:2), labels = c("Hombres", "Mujeres")),
          ciiu4_1_fct = as.factor(ciiu4_1),
          prov_fct = factor(provincia, levels = c(1:24), 
@@ -33,6 +33,8 @@ df_raw <- ress_raw %>%
                                       "Tungurahua","Z.Chinchipe","Galápagos","Sucumbíos","Orellana",
                                       "Santo Domingo de los Tsáchilas","Santa Elena")),
          tamano_empleo = as.factor(tamano_empleo),
+         est_civil_rc = as.factor(est_civil_rc),
+         logsal=ifelse(sueldo>=1,log(sueldo),NA),
          grupos_edad = case_when(
            edad <= 22 ~ 'menos de 23',
            edad %>% between(23,26) ~ '23-26',
@@ -104,16 +106,11 @@ df_edad <-
   mutate(grupos_edad = as.factor(grupos_edad)) %>%
   group_by(grupos_edad, Sexo) %>%
   summarize(sueldo_promedio = mean(sueldo, na.rm = TRUE),
-            dias_promedio = mean(dias, na.rm = TRUE))
+            sueldo_mediano = median(sueldo, na.rm = TRUE))
 
-# Base para los dias promedio trabajados ------------------------------------------------------------------------------------------------
+# Regresion ------------------------------------------------------------------------------------------------
 
-df_prom <- 
-  df_raw %>%
-  group_by(Sexo) %>%
-  summarise(sueldo_promedio = mean(sueldo, na.rm = TRUE),
-            dias_promedio = mean(dias, na.rm = TRUE)) %>%
-  mutate(salario_dias = sueldo_promedio/dias_promedio)
+regresion_cv <- 
 
 # theme -----
 
@@ -161,17 +158,21 @@ df_perc <- ggplot(df_empresa,
 
 # visualizacion del % para hombres y mujeres en los tipos de ciiu ------------------------------------------------------------------------------------------------
 
-graf_ciiu <- ggplot(df_ciiu %>% filter(ciiu4_1_fct != "Otro"), 
+graf_ciiu <- ggplot(df_ciiu %>% filter(ciiu4_1_fct %in% c("Organizaciones internacionales",
+                                                          "Industria minero-energética",
+                                                          "Servicios publicos/defensa/saneamiento",
+                                                          "Actividades financieras y de seguros",
+                                                          "Salud y asistencia")), 
                   aes(ciiu4_1_fct,porcentaje_empleo, fill = Sexo)) +
   geom_col(width = 0.8,
-           position = "dodge",
+           position = "stack",
            color = "black") +
   coord_flip() +
   geom_text(aes(label = scales::percent(porcentaje_empleo,accuracy = 0.1)), color = "black", 
             size = 2.4,
-            position = position_dodge(0.9),
-            hjust = -0.1,
-            vjust = -0.3) +
+            position = position_stack(0.5),
+            hjust = 0.1,
+            vjust = -0.1) +
   scale_fill_manual(values = c("#FFAC8E","#647A8F")) +
   labs(x = "",
        y = "",
@@ -180,12 +181,28 @@ graf_ciiu <- ggplot(df_ciiu %>% filter(ciiu4_1_fct != "Otro"),
 
 # visualizacion de la edad ------------------------------------------------------------------------------------------------
 
-graf_edad <- ggplot(df_edad, aes(grupos_edad, sueldo_promedio, color = Sexo)) +
+graf_edad <- ggplot(df_edad %>% filter(grupos_edad != "menos de 23"),
+                    aes(grupos_edad, sueldo_promedio, color = Sexo)) +
+  geom_line() +
   geom_point() +
   scale_color_manual(values = c("#FFAC8E","#647A8F")) +
   labs(x = "",
        y = "",
        title = "Evolucion del sueldo promedio para hombres y mujeres Ecuador por grupos de edad") +
   theme_ress +
-  theme(axis.text.x = element_text(angle = 45, vjust = 0.5),
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5),
+        axis.text.y = element_text(size = 12))
+
+# visualizacion de la edad ------------------------------------------------------------------------------------------------
+
+graf_edad_med <- ggplot(df_edad %>% filter(grupos_edad != "menos de 23"),
+                    aes(grupos_edad, sueldo_mediano, color = Sexo)) +
+  geom_line() +
+  geom_point() +
+  scale_color_manual(values = c("#FFAC8E","#647A8F")) +
+  labs(x = "",
+       y = "",
+       title = "Evolucion de la mediana del salario para hombres y mujeres Ecuador por grupos de edad") +
+  theme_ress +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5),
         axis.text.y = element_text(size = 12))
