@@ -12,8 +12,8 @@ if(!require(lubridate)) install.packages("lubridate", repos = "http://cran.us.r-
 if(!require(tidyverse)) install.packages("tidyverse", repos = "http://cran.us.r-project.org")
 if(!require(patchwork)) install.packages("patchwork", repos = "http://cran.us.r-project.org")
 if(!require(scales)) install.packages("scales", repos = "http://cran.us.r-project.org")
-if(!require(tidyr)) install.packages("scales", repos = "http://cran.us.r-project.org")
-
+if(!require(tidyr)) install.packages("tidyr", repos = "http://cran.us.r-project.org")
+if(!require(car)) install.packages("car", repos = "http://cran.us.r-project.org")
 
 # Cargando datos ------------------------------------------------------------------------------------------
 
@@ -110,7 +110,15 @@ df_edad <-
 
 # Regresion ------------------------------------------------------------------------------------------------
 
-regresion_cv <- 
+df_regresion <- df_raw %>%
+  select(Sexo, logsal, est_civil_rc, grupos_edad, prov_fct, tamano_empleo) %>%
+  mutate(est_civil_rc = fct_recode(est_civil_rc,
+                                   "Soltero" = "1",
+                                   "Casado" = "2"))
+
+regresion_sal <- lm(formula = logsal ~ Sexo*est_civil_rc + grupos_edad + prov_fct + tamano_empleo,
+                    data = df_regresion)
+ 
 
 # theme -----
 
@@ -202,7 +210,7 @@ graf_edad_med <- ggplot(df_edad %>% filter(grupos_edad != "menos de 23"),
   scale_color_manual(values = c("#FFAC8E","#647A8F")) +
   labs(x = "",
        y = "",
-       title = "Evolucion de la mediana del salario para hombres y mujeres Ecuador por grupos de edad") +
+       title = "Mediana del salario para hombres y mujeres Ecuador por grupos de edad") +
   theme_ress +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5),
         axis.text.y = element_text(size = 12))
