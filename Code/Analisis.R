@@ -57,20 +57,6 @@ df_median <-
   group_by(fecha_1, Sexo) %>%
   summarise(sueldo_mediano = median(sueldo, na.rm = TRUE))
 
-# Base del % para hombres y mujeres en los tipos de empresas ------------------------------------------------------------------------------------------------
-
-df_empresa <- 
-  df_raw %>%
-  filter(ano == 2023, mes == 3) %>% 
-  mutate(empresas_fct = fct_collapse(tamano_empleo,
-                                     "Microempresa" = "1",
-                                     "Pequeña" = "2",
-                                     "Mediana" = c("3","4"),
-                                     "Grande" = "5")) %>%
-  group_by(empresas_fct, Sexo) %>%
-  summarize(empleo = n()) %>%
-  mutate(porcentaje_empleo = empleo/sum(empleo))
-
 # Base del % para hombres y mujeres por ciiu ------------------------------------------------------------------------------------------------
 
 df_ciiu <- 
@@ -108,18 +94,6 @@ df_edad <-
   summarize(sueldo_promedio = mean(sueldo, na.rm = TRUE),
             sueldo_mediano = median(sueldo, na.rm = TRUE))
 
-# Regresion ------------------------------------------------------------------------------------------------
-
-df_regresion <- df_raw %>%
-  select(Sexo, logsal, est_civil_rc, grupos_edad, prov_fct, tamano_empleo) %>%
-  mutate(est_civil_rc = fct_recode(est_civil_rc,
-                                   "Soltero" = "1",
-                                   "Casado" = "2"))
-
-regresion_sal <- lm(formula = logsal ~ Sexo*est_civil_rc + grupos_edad + prov_fct + tamano_empleo,
-                    data = df_regresion)
- 
-
 # theme -----
 
 theme_ress <-
@@ -140,26 +114,6 @@ graf_sueldo <- ggplot(df_median, aes(fecha_1, sueldo_mediano, color = Sexo)) +
   labs(x = "",
        y = "",
        title = "Mediana del sueldo para hombres y mujeres Ecuador 2022-2023") +
-  theme_ress +
-  theme(axis.text.x = element_text(angle = 45, vjust = 0.5),
-        axis.text.y = element_text(size = 12))
-
-# visualizacion del % para hombres y mujeres en los tipos de empresas ------------------------------------------------------------------------------------------------
-
-df_perc <- ggplot(df_empresa, 
-           aes(reorder(empresas_fct,porcentaje_empleo),porcentaje_empleo, fill = Sexo)) +
-  geom_col(width = 0.8,
-           position = "dodge",
-           color = "black") +
-  geom_text(aes(label = scales::percent(porcentaje_empleo,accuracy = 0.1)), color = "black", 
-            size = 2.4,
-            position = position_dodge(0.9),
-            hjust = 0.4,
-            vjust = -0.3) +
-  scale_fill_manual(values = c("#FFAC8E","#647A8F")) +
-  labs(x = "",
-       y = "",
-       title = "% de trabajos de hombres y mujeres segun el tipo de empresa") +
   theme_ress +
   theme(axis.text.x = element_text(angle = 45, vjust = 0.5),
         axis.text.y = element_text(size = 12))
@@ -186,20 +140,6 @@ graf_ciiu <- ggplot(df_ciiu %>% filter(ciiu4_1_fct %in% c("Organizaciones intern
        y = "",
        title = "% de trabajos de hombres y mujeres segun la actividad productiva") +
   theme_ress
-
-# visualizacion de la edad ------------------------------------------------------------------------------------------------
-
-graf_edad <- ggplot(df_edad %>% filter(grupos_edad != "menos de 23"),
-                    aes(grupos_edad, sueldo_promedio, color = Sexo)) +
-  geom_line() +
-  geom_point() +
-  scale_color_manual(values = c("#FFAC8E","#647A8F")) +
-  labs(x = "",
-       y = "",
-       title = "Evolucion del sueldo promedio para hombres y mujeres Ecuador por grupos de edad") +
-  theme_ress +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5),
-        axis.text.y = element_text(size = 12))
 
 # visualizacion de la edad ------------------------------------------------------------------------------------------------
 
