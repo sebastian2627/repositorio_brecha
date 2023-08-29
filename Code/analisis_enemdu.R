@@ -40,7 +40,7 @@ df_enemdu <- enemdu_persona %>%
          estado_civil = factor(estado_civil, levels = c(1,6), labels = c("Casado", "Soltero")),
          nivel_instruccion = factor(nivel_instruccion, levels = c(1:5), labels = c("Ninguno",
                                                                                    "Centro de alfabetizacion",
-                                                                                   "Basica",
+                                                                                   "Básica ",
                                                                                    "Media",
                                                                                    "Superior")),
          logsal=ifelse(ingreso_laboral>=1,log(ingreso_laboral),NA),
@@ -63,10 +63,10 @@ df_enemdu <- enemdu_persona %>%
 df_horas <- 
   df_enemdu %>%
   filter(horas_trabajadas <= 60) %>%
-  group_by(sexo) %>%
+  group_by(grupos_edad, sexo) %>%
   summarise(horas_promedio = mean(horas_trabajadas, na.rm = TRUE),
-            ing_prom = mean(ingreso_laboral, na.rm = TRUE),
-            salario_hora = ing_prom/horas_promedio)
+            ing_med = median(ingreso_laboral, na.rm = TRUE),
+            salario_hora = ing_med/horas_promedio)
 
 # Analisis regresion ------------------------------------------------------------------------------------------------
 
@@ -91,5 +91,44 @@ df_edades <-
   group_by(grupos_edad, sexo) %>%
   summarize(horas_promedio = mean(horas_trabajadas, na.rm = TRUE))
 
+# Visualizacion educacion ------------------------------------------------------------------------------------------------
 
+graf_educacion <- ggplot(df_educ, aes(nivel_instruccion, porcentaje_persona, fill = sexo)) +
+  geom_col(width = 0.8,
+           color = "black") +
+  geom_text(aes(label = scales::percent(porcentaje_persona,accuracy = 0.1)), color = "black", 
+            size = 2.4,
+            position = position_dodge(0.5),
+            hjust = 0.4,
+            vjust = -0.3) +
+  scale_fill_manual(values = c("#647A8F","#FFAC8E")) +
+  facet_grid(cols = vars(sexo)) +
+  labs(x = "",
+       y = "",
+       title = "% del nivel de instrucción entre hombres y mujeres en el mercado laboral") +
+  theme_ress +
+  theme(axis.text.y = element_blank(),
+        axis.ticks.y = element_blank())
 
+# Visualizacion horas trabajadas y sueldo por hora ------------------------------------------------------------------------------------------------
+
+df_brecha <- ggplot(df_horas %>% filter(grupos_edad != "menos de 23"),
+                    aes(grupos_edad, ing_med, color = sexo)) +
+  geom_line() +
+  geom_point() +
+  scale_color_manual(values = c("#FFAC8E","#647A8F")) +
+  labs(x = "",
+       y = "",
+       title = "Mediana del salario para hombres y mujeres Ecuador por grupos de edad") +
+  theme_ress +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5),
+        axis.text.y = element_text(size = 12))
+  
+df_hora <- 
+  df_enemdu %>%
+  filter(horas_trabajadas <= 60) %>%
+  group_by(sexo) %>%
+  summarise(horas_promedio = mean(horas_trabajadas, na.rm = TRUE),
+            ing_prom = mean(ingreso_laboral, na.rm = TRUE),
+            ing_med = median(ingreso_laboral, na.rm = TRUE),
+            salario_hora = ing_med/horas_promedio)
