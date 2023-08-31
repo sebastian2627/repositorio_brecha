@@ -123,12 +123,12 @@ df_brecha <- ggplot(df_horas %>% filter(grupos_edad != "menos de 23"),
   theme_ress +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5),
         axis.text.y = element_text(size = 12))
+
+# Visualizacion horas trabajadas y sueldo por hora ------------------------------------------------------------------------------------------------
+
+
+df_brechah <- ggplot(df_horas %>% filter(grupos_edad != "menos de 23"), 
+                     aes(grupos_edad, salario_hora, color = sexo)) +
+  geom_line() +
+  geom_point() 
   
-df_hora <- 
-  df_enemdu %>%
-  filter(horas_trabajadas <= 60) %>%
-  group_by(sexo) %>%
-  summarise(horas_promedio = mean(horas_trabajadas, na.rm = TRUE),
-            ing_prom = mean(ingreso_laboral, na.rm = TRUE),
-            ing_med = median(ingreso_laboral, na.rm = TRUE),
-            salario_hora = ing_med/horas_promedio)
