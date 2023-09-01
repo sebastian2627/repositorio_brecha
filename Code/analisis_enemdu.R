@@ -109,26 +109,4 @@ graf_educacion <- ggplot(df_educ, aes(nivel_instruccion, porcentaje_persona, fil
   theme_ress +
   theme(axis.text.y = element_blank(),
         axis.ticks.y = element_blank())
-
-# Visualizacion horas trabajadas y sueldo por hora ------------------------------------------------------------------------------------------------
-
-df_brecha <- ggplot(df_horas %>% filter(grupos_edad != "menos de 23"),
-                    aes(grupos_edad, ing_med, color = sexo)) +
-  geom_line() +
-  geom_point() +
-  scale_color_manual(values = c("#FFAC8E","#647A8F")) +
-  labs(x = "",
-       y = "",
-       title = "Mediana del salario para hombres y mujeres Ecuador por grupos de edad") +
-  theme_ress +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5),
-        axis.text.y = element_text(size = 12))
-
-# Visualizacion horas trabajadas y sueldo por hora ------------------------------------------------------------------------------------------------
-
-
-df_brechah <- ggplot(df_horas %>% filter(grupos_edad != "menos de 23"), 
-                     aes(grupos_edad, salario_hora, color = sexo)) +
-  geom_line() +
-  geom_point() 
   

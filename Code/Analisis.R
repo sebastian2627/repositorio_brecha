@@ -84,16 +84,6 @@ df_ciiu <-
   summarize(empleo = n()) %>%
   mutate(porcentaje_empleo = empleo/sum(empleo))
 
-# Base para la edad de hombres y mujeres con respecto del salario ------------------------------------------------------------------------------------------------
-
-df_edad <- 
-  df_raw %>%
-  filter(edad <= 75) %>%
-  mutate(grupos_edad = as.factor(grupos_edad)) %>%
-  group_by(grupos_edad, Sexo) %>%
-  summarize(sueldo_promedio = mean(sueldo, na.rm = TRUE),
-            sueldo_mediano = median(sueldo, na.rm = TRUE))
-
 # theme -----
 
 theme_ress <-
@@ -141,16 +131,4 @@ graf_ciiu <- ggplot(df_ciiu %>% filter(ciiu4_1_fct %in% c("Organizaciones intern
        title = "% de trabajos de hombres y mujeres segun la actividad productiva") +
   theme_ress
 
-# visualizacion de la edad ------------------------------------------------------------------------------------------------
 
-graf_edad_med <- ggplot(df_edad %>% filter(grupos_edad != "menos de 23"),
-                    aes(grupos_edad, sueldo_mediano, color = Sexo)) +
-  geom_line() +
-  geom_point() +
-  scale_color_manual(values = c("#FFAC8E","#647A8F")) +
-  labs(x = "",
-       y = "",
-       title = "Mediana del salario para hombres y mujeres Ecuador por grupos de edad") +
-  theme_ress +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5),
-        axis.text.y = element_text(size = 12))
