@@ -209,6 +209,27 @@ theme_ress <-
 
 # captions -----
 
+caption_sueldo <- "Nota: se usó la mediana del ingreso laboral para la realización de este gráfico, 
+al ser un mejor indicador que el ingreso laboral promedio para observar la comparativa entre los ingresos laborales
+de hombres y mujeres en el mercado laboral, 
+a causa de que la mediana se ve menos afectada por valores atípicos o valores extremos que sí 
+pueden distorsionar en mayor medida al promedio. La mediana del sueldo indica cual es el valor 
+del ingreso laboral que se encuentra en el medio de todo el conjunto de datos, de modo que la mitad de los 
+trabajadores del sector formal ganan más que la mediana del ingreso laboral, mientras que la otra mitad gana menos.
+Fuente: Instituto Nacional de Estadística y Censos (INEC), www.ecuadorencifras.gob.ec"
+
+caption_est <- "Fuente: Instituto Nacional de Estadística y Censos (INEC), www.ecuadorencifras.gob.ec"
+
+caption_horas <- "Nota: Se decidió dividir la mediana del ingreso laboral por el promedio de horas trabajadas para
+hombres y mujeres debido que se descubrió que, en promedio, los hombres trabajan de 4 a 5 horas más que las mujeres. 
+Por lo que las remuneraciones se debían ajustar también por esta variable endógena. 
+Fuente: Instituto Nacional de Estadística y Censos (INEC), www.ecuadorencifras.gob.ec"
+
+caption_educ <- "Fuente: Instituto Nacional de Estadística y Censos (INEC), www.ecuadorencifras.gob.ec"
+
+caption_ciiu <- "Nota: Se tomaron en cuenta cinco industrias del Ecuador que han ofrecido las más altas remuneraciones 
+laborales en años prepandemia y que son a la vez, actividades productivas que requieren en su mayoría títulos de nivel 
+superior para ser ejercidas. Fuente: Instituto Nacional de Estadística y Censos (INEC), www.ecuadorencifras.gob.ec"
 
 # visualizacion de la mediana ------------------------------------------------------------------------------------------------
 
@@ -218,7 +239,8 @@ graf_sueldo <- ggplot(df_median_en, aes(fecha_1, sueldo_mediano, color = sexo)) 
   scale_color_manual(values = c("#FFAC8E","#647A8F")) +
   labs(x = "",
        y = "",
-       title = "Mediana del sueldo para hombres y mujeres Ecuador 2008-2018") +
+       title = "Mediana del ingreso laboral para hombres y mujeres Ecuador 2008-2018",
+        caption = str_wrap(caption_sueldo, 160)) +
   theme_ress +
   theme(axis.text.x = element_text(angle = 45, vjust = 0.5),
         axis.text.y = element_text(size = 12))
@@ -233,7 +255,8 @@ graf_est <- ggplot(df_median_enen, aes(fecha_1, sueldo_mediano, color = sexo)) +
   labs(x = "Fecha", y = "Ingreso Mediano", color = "Sexo") +
   labs(x = "",
        y = "",
-       title = "Brecha del salario mediano entre hombres y mujeres por estado civil 2008 -2018") +
+       title = "Brecha de la mediana del ingreso laboral entre hombres y mujeres por estado civil 2008 -2018",
+       caption = str_wrap(caption_est, 160)) +
   theme_ress
 
 # visualizacion horas ------------------------------------------------------------------------------------------------
@@ -244,7 +267,8 @@ graf_horas <- ggplot(df_horas, aes(fecha_1, salario_hora, color = sexo)) +
   scale_color_manual(values = c("#FFAC8E","#647A8F")) +
   labs(x = "",
        y = "",
-       title = "Mediana del sueldo para hombres y mujeres Ecuador dividido por el numero de horas promedio trabajadas 2008-2018") +
+       title = "Mediana del ingreso laboral por hora para hombres y mujeres Ecuador 2008-2018",
+       caption = str_wrap(caption_horas, 160)) +
   theme_ress +
   theme(axis.text.x = element_text(angle = 45, vjust = 0.5),
         axis.text.y = element_text(size = 12))
@@ -259,7 +283,8 @@ graf_eduacion <- ggplot(df_educacion, aes(x = fecha_1, y = porcentaje_persona, c
   labs(x = "",
        y = "",
        title = "Evolucion porcentual del nivel de instrucción de hombres y mujeres en el mercado laboral 2008-2018",
-       color = "Nivel de instruccion") +
+       color = "Nivel de instrucción",
+       caption = str_wrap(caption_educ, 160)) +
   theme_ress
 
 # Visualizacion salario por estado civil ------------------------------------------------------------------------------------------------
@@ -272,24 +297,44 @@ graf_ciiu <- ggplot(df_ciiu %>% filter(ciiu4 %in% c("Enseñanza",
                     aes(fecha_1, porcentaje_empleo, fill = ciiu4)) +
   geom_bar(stat = "identity",
            position = "fill") +
-  facet_wrap(~sexo) +
-  geom_text(aes(label = scales::percent(porcentaje_empleo,accuracy = 0.1)), color = "black",
-            size = 2.4,
-            position = position_fill(),
-            hjust = 0.5,
-            vjust = 0.9) +
+  facet_wrap(~sexo)  +
   scale_fill_manual(values = c("#FFAC8E", '#2E5994', '#09A4CC','#F44D54','#52307c')) +
   labs(x = "",
        y = "",
-       title = "% de trabajos de hombres y mujeres segun la actividad productiva",
-       fill = "Actividad productiva") +
+       title = "% de trabajos de hombres y mujeres por actividad productiva donde se necesita mayormente un título de nivel superior",
+       fill = "Actividad productiva",
+       caption = str_wrap(caption_ciiu, 160)) +
   theme_ress
 
+# guardando los graficos-----
 
+ggsave("figures/grafico_sueldo.png", 
+       plot = graf_sueldo,
+       device = "png",
+       width = 12,
+       height = 8,
+       dpi = 1200)
 
+ggsave("figures/grafico_est.png", 
+       plot = graf_est,
+       device = "png",
+       width = 12,
+       height = 8,
+       dpi = 1200)
 
+ggsave("figures/grafico_educ.png", 
+       plot = graf_eduacion,
+       device = "png",
+       width = 12,
+       height = 8,
+       dpi = 1200)
 
-
+ggsave("figures/grafico_ciiu.png", 
+       plot = graf_ciiu,
+       device = "png",
+       width = 12,
+       height = 8,
+       dpi = 1200)
 
 
 
