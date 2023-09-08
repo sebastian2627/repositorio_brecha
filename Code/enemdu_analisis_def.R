@@ -91,7 +91,7 @@ df_bases <- ENEMDU_TOT %>%
 
 # Analisis horas trabajadas ------------------------------------------------------------------------------------------------
 
-df_horas <- 
+df_horas_g <- 
   df_bases %>%
   filter(horas_trabajadas <= 60) %>%
   group_by(grupos_edad, sexo) %>%
@@ -207,6 +207,8 @@ theme_ress <-
         legend.background = element_rect(fill="white", size=0.5, linetype="solid", colour ="black"),
         text =  element_text(color = 'black', size = 12))
 
+# captions -----
+
 
 # visualizacion de la mediana ------------------------------------------------------------------------------------------------
 
@@ -256,7 +258,7 @@ graf_eduacion <- ggplot(df_educacion, aes(x = fecha_1, y = porcentaje_persona, c
   facet_wrap(~sexo) +
   labs(x = "",
        y = "",
-       title = "Evolucion porcentual del nivel de instrucción entre hombres y mujeres en el mercado laboral 2008-2018",
+       title = "Evolucion porcentual del nivel de instrucción de hombres y mujeres en el mercado laboral 2008-2018",
        color = "Nivel de instruccion") +
   theme_ress
 
