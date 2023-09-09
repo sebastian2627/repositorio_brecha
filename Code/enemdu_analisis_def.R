@@ -287,7 +287,7 @@ graf_eduacion <- ggplot(df_educacion, aes(x = fecha_1, y = porcentaje_persona, c
        caption = str_wrap(caption_educ, 160)) +
   theme_ress
 
-# Visualizacion salario por estado civil ------------------------------------------------------------------------------------------------
+# Visualizacion salario por ciiu ------------------------------------------------------------------------------------------------
 
 graf_ciiu <- ggplot(df_ciiu %>% filter(ciiu4 %in% c("Enseñanza",
                                                     "Industria minero-energética",
@@ -298,7 +298,7 @@ graf_ciiu <- ggplot(df_ciiu %>% filter(ciiu4 %in% c("Enseñanza",
   geom_bar(stat = "identity",
            position = "fill") +
   facet_wrap(~sexo)  +
-  scale_fill_manual(values = c("#FFAC8E", '#2E5994', '#09A4CC','#F44D54','#52307c')) +
+  scale_fill_manual(values = c("#FFAC8E", '#2E5994', '#09A4CC','#FFB6C1','#DCBEE6')) +
   labs(x = "",
        y = "",
        title = "% de trabajos de hombres y mujeres por actividad productiva donde se necesita mayormente un título de nivel superior",
@@ -336,5 +336,10 @@ ggsave("figures/grafico_ciiu.png",
        height = 8,
        dpi = 1200)
 
-
+ggsave("figures/grafico_horas.png", 
+       plot = graf_horas,
+       device = "png",
+       width = 12,
+       height = 8,
+       dpi = 1200)
 
