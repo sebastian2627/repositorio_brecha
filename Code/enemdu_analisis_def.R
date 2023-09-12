@@ -14,6 +14,7 @@ if(!require(patchwork)) install.packages("patchwork", repos = "http://cran.us.r-
 if(!require(scales)) install.packages("scales", repos = "http://cran.us.r-project.org")
 if(!require(tidyr)) install.packages("tidyr", repos = "http://cran.us.r-project.org")
 if(!require(car)) install.packages("car", repos = "http://cran.us.r-project.org")
+if(!require(survey)) install.packages("survey", repos = "http://cran.us.r-project.org")
 
 # Cargando datos ------------------------------------------------------------------------------------------
 
@@ -42,10 +43,12 @@ ENEMDU_2017 <- read_delim("data_enemdu/ENEMDU_PERSONAS_2017_12_hom.csv",
 ENEMDU_2018 <- read_delim("data_enemdu/ENEMDU_PERSONAS_2018_12_hom.csv", 
                                           delim = ";", escape_double = FALSE, trim_ws = TRUE)
 
+
 # Definir una función para seleccionar las variables deseadas de las ENEMDU
 
 vars <- function(data) {
-  return(data[, c("p02", "p01", "p03", "p06", "p24", "p45", "ingrl", "nnivins", "periodo", "rama1")])
+  return(data[, c("p02", "p01", "p03", "p06", "p24", "p45", "ingrl", "nnivins", "periodo", "rama1",
+                  "fexp", "upm","estrato")])
 }
 
 # Crear una lista de las bases de datos
