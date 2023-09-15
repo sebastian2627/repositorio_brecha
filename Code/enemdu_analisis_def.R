@@ -63,7 +63,7 @@ bases <- lapply(bases, convertir_estrato_a_double)
 # Definir una función para seleccionar las variables deseadas de las ENEMDU
 
 vars <- function(data) {
-  return(data[, c("p02", "p01", "p03", "p06", "p24", "p45", "ingrl", "nnivins", "periodo", "fexp", "upm", "estrato")])
+  return(data[, c("p02", "p01", "p03", "p06", "p24", "p45", "ingrl", "nnivins", "periodo", "fexp", "upm", "estrato", "rama1")])
 }
 
 # Aplicar la función a cada base de datos usando lapply
@@ -86,7 +86,8 @@ df_bases <- ENEMDU_TOT %>%
             'ingreso_laboral'='ingrl',
             'nivel_instruccion'='nnivins',
             'ano' = 'periodo',
-            'ciiu' = 'rama1') %>%
+            'ciiu' = 'rama1',
+            'estrato','fexp','upm') %>%
   filter(edad >= 23, edad <= 65, 
          horas_trabajadas > 0, horas_trabajadas < 999,
          experiencia_laboral > 0, experiencia_laboral < 99,
@@ -99,17 +100,113 @@ df_bases <- ENEMDU_TOT %>%
                                                                                    "Básica ",
                                                                                    "Media",
                                                                                    "Superior")),
-         ciiu4 = as.factor(ciiu))
+         ciiu4 = as.factor(ciiu),
+         fecha_1= as.Date(paste0(ano, "01"), format = "%Y%m%d"))
 
-# Analisis horas trabajadas ------------------------------------------------------------------------------------------------
+# Diseño Muestral 
 
-df_horas_g <- 
-  df_bases %>%
-  filter(horas_trabajadas <= 60) %>%
-  group_by(grupos_edad, sexo) %>%
-  summarise(horas_promedio = mean(horas_trabajadas, na.rm = TRUE),
-            ing_med = median(ingreso_laboral, na.rm = TRUE),
-            salario_hora = ing_med/horas_promedio)
+dm <- svydesign(ids = ~ upm,
+                strata = ~ estrato, 
+                weights = ~ fexp, 
+                nest = TRUE,
+                na.action = 'na.exclude',
+                data = df_bases)
+
+# Medianas hombres y mujeres (con pesos)
+
+mediana_tab <- svyby(
+  formula = ~ ingreso_laboral,
+  by = ~ fecha_1 + sexo,
+  design = dm,
+  FUN = svyquantile,
+  quantiles = 0.5,  
+  na.rm = TRUE,
+  keep.names = FALSE
+)
+
+# visualizacion de la mediana con pesos ------------------------------------------------------------------------------------------------
+
+graf_sueldop <- ggplot(mediana_tab, aes(fecha_1, ingreso_laboral, color = sexo)) +
+  geom_line() +
+  geom_point(color = 'black') +
+  scale_color_manual(values = c("#FFAC8E","#647A8F")) +
+  labs(x = "",
+       y = "",
+       title = "Mediana del ingreso laboral para hombres y mujeres Ecuador 2008-2018",
+       caption = str_wrap(caption_sueldo, 160)) +
+  theme_ress +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5),
+        axis.text.y = element_text(size = 12))
+
+# ing por hora hombres y mujeres (con pesos)
+
+hr_tab <- svyby(
+  formula = ~ horas_trabajadas,
+  by = ~ fecha_1 + sexo,
+  design = dm,
+  FUN = svymean,
+  na.rm = TRUE,
+  keep.names = FALSE,
+  subset = nivel_instruccion != "Ninguno" & nivel_instruccion != "Centro de alfabetizacion" &
+    horas_trabajadas <= 60
+)
+
+inhr <- full_join(mediana_tab, hr_tab, by = c("fecha_1", "sexo"))
+
+inhr <- inhr %>%
+  mutate(ingreso_hora = ingreso_laboral/horas_trabajadas)
+
+# visualizacion horas ------------------------------------------------------------------------------------------------
+
+graf_horasp <- ggplot(inhr, aes(fecha_1, ingreso_hora, color = sexo)) +
+  geom_line() +
+  geom_point(color = 'black') +
+  scale_color_manual(values = c("#FFAC8E","#647A8F")) +
+  labs(x = "",
+       y = "",
+       title = "Ingreso laboral por hora para hombres y mujeres Ecuador 2008-2018",
+       caption = str_wrap(caption_horas, 160)) +
+  theme_ress +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5),
+        axis.text.y = element_text(size = 12))
+
+# Medianas hombres y mujeres con respecto al estado civil (con pesos)
+
+cv_tab <- svyby(
+  formula = ~ ingreso_laboral,
+  by = ~ fecha_1 + sexo + estado_civil,
+  design = dm,
+  FUN = svyquantile,
+  quantiles = 0.5,
+  na.rm = TRUE,
+  keep.names = FALSE,
+  subset = nivel_instruccion != "Ninguno" & nivel_instruccion != "Centro de alfabetizacion"
+)
+
+# Visualizacion salario por estado civil con pesos ------------------------------------------------------------------------------------------------
+
+graf_estp <- ggplot(cv_tab, aes(fecha_1, ingreso_laboral, color = sexo)) +
+  geom_line() +
+  geom_point(color = 'black') +
+  scale_color_manual(values = c("#FFAC8E","#647A8F")) +
+  facet_grid(estado_civil ~ .) +
+  labs(x = "Fecha", y = "Ingreso Mediano", color = "Sexo") +
+  labs(x = "",
+       y = "",
+       title = "Brecha de la media del ingreso laboral entre hombres y mujeres por estado civil 2008 -2018",
+       caption = str_wrap(caption_est, 160)) +
+  theme_ress
+
+# educacion hombres y mujeres (con pesos)
+
+educ_tab <- svyby(
+  formula = ~ nivel_instruccion,
+  by = ~ fecha_1 + sexo,
+  design = dm,
+  FUN = svymean,
+  na.rm = TRUE,
+  keep.names = FALSE
+)
 
 # Base de las medianas para hombres y mujeres ------------------------------------------------------------------------------------------------
 
@@ -153,7 +250,7 @@ df_median_enen <-
   group_by(fecha_1, sexo, estado_civil) %>%
   summarise(sueldo_mediano = median(ingreso_laboral, na.rm = TRUE))
 
-# base de la mediana por estado civil ------------------------------------------------------------------------------------------------
+# base de la mediana por ciiu ------------------------------------------------------------------------------------------------
 
 df_ciiu <- 
   df_bases %>%
@@ -233,7 +330,7 @@ Fuente: Instituto Nacional de Estadística y Censos (INEC), www.ecuadorencifras.
 caption_est <- "Fuente: Instituto Nacional de Estadística y Censos (INEC), www.ecuadorencifras.gob.ec"
 
 caption_horas <- "Nota: Se decidió dividir la mediana del ingreso laboral por el promedio de horas trabajadas para
-hombres y mujeres debido que se descubrió que, en promedio, los hombres trabajan de 4 a 5 horas más que las mujeres. 
+hombres y mujeres debido que se descubrió que, en promedio, los hombres trabajan más que las mujeres. 
 Por lo que las remuneraciones se debían ajustar también por esta variable endógena. 
 Fuente: Instituto Nacional de Estadística y Censos (INEC), www.ecuadorencifras.gob.ec"
 
