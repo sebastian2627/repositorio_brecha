@@ -193,7 +193,7 @@ graf_estp <- ggplot(cv_tab, aes(fecha_1, ingreso_laboral, color = sexo)) +
   labs(x = "Fecha", y = "Ingreso Mediano", color = "Sexo") +
   labs(x = "",
        y = "",
-       title = "Brecha de la media del ingreso laboral entre hombres y mujeres por estado civil 2008 -2018",
+       title = "Brecha de la mediana del ingreso laboral entre hombres y mujeres por estado civil 2008 -2018",
        caption = str_wrap(caption_est, 160)) +
   theme_ress
 
@@ -201,6 +201,17 @@ graf_estp <- ggplot(cv_tab, aes(fecha_1, ingreso_laboral, color = sexo)) +
 
 educ_tab <- svyby(
   formula = ~ nivel_instruccion,
+  by = ~ fecha_1 + sexo,
+  design = dm,
+  FUN = svymean,
+  na.rm = TRUE,
+  keep.names = FALSE
+)
+
+# ciiu hombres y mujeres (con pesos)
+
+ciiu_tab <- svyby(
+  formula = ~ ciiu4,
   by = ~ fecha_1 + sexo,
   design = dm,
   FUN = svymean,
@@ -417,6 +428,27 @@ graf_ciiu <- ggplot(df_ciiu %>% filter(ciiu4 %in% c("Enseñanza",
 
 # guardando los graficos-----
 
+ggsave("figures/graf_sueldop.png", 
+       plot = graf_sueldop,
+       device = "png",
+       width = 12,
+       height = 8,
+       dpi = 1200)
+
+ggsave("figures/graf_estp.png", 
+       plot = graf_estp,
+       device = "png",
+       width = 12,
+       height = 8,
+       dpi = 1200)
+
+ggsave("figures/graf_horasp.png", 
+       plot = graf_horasp,
+       device = "png",
+       width = 12,
+       height = 8,
+       dpi = 1200)
+
 ggsave("figures/grafico_sueldo.png", 
        plot = graf_sueldo,
        device = "png",
@@ -426,6 +458,13 @@ ggsave("figures/grafico_sueldo.png",
 
 ggsave("figures/grafico_est.png", 
        plot = graf_est,
+       device = "png",
+       width = 12,
+       height = 8,
+       dpi = 1200)
+
+ggsave("figures/grafico_horas.png", 
+       plot = graf_horas,
        device = "png",
        width = 12,
        height = 8,
@@ -445,10 +484,4 @@ ggsave("figures/grafico_ciiu.png",
        height = 8,
        dpi = 1200)
 
-ggsave("figures/grafico_horas.png", 
-       plot = graf_horas,
-       device = "png",
-       width = 12,
-       height = 8,
-       dpi = 1200)
 
