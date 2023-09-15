@@ -43,19 +43,29 @@ ENEMDU_2017 <- read_delim("data_enemdu/ENEMDU_PERSONAS_2017_12_hom.csv",
 ENEMDU_2018 <- read_delim("data_enemdu/ENEMDU_PERSONAS_2018_12_hom.csv", 
                                           delim = ";", escape_double = FALSE, trim_ws = TRUE)
 
+# Crear una lista de las bases de datos
+
+bases <- list(ENEMDU_2007, ENEMDU_2008, ENEMDU_2009, ENEMDU_2010, ENEMDU_2011,
+              ENEMDU_2012, ENEMDU_2013, ENEMDU_2014, ENEMDU_2015, ENEMDU_2016,
+              ENEMDU_2017, ENEMDU_2018)
+
+# Función para convertir la variable "estrato" de character a numeric en un data frame dado
+
+convertir_estrato_a_numeric <- function(df) {
+  df$estrato <- as.numeric(df$estrato)
+  return(df)
+}
+
+# Aplicar la función a cada data frame en la lista
+
+lista_dataframes <- lapply(bases, convertir_estrato_a_numeric)
+
 
 # Definir una función para seleccionar las variables deseadas de las ENEMDU
 
 vars <- function(data) {
-  return(data[, c("p02", "p01", "p03", "p06", "p24", "p45", "ingrl", "nnivins", "periodo", "rama1",
-                  "fexp", "upm","estrato")])
+  return(data[, c("p02", "p01", "p03", "p06", "p24", "p45", "ingrl", "nnivins", "periodo", "fexp", "upm","estrato")])
 }
-
-# Crear una lista de las bases de datos
-
-bases <- list(ENEMDU_2007, ENEMDU_2008, ENEMDU_2009, ENEMDU_2010, ENEMDU_2011,
-                       ENEMDU_2012, ENEMDU_2013, ENEMDU_2014, ENEMDU_2015, ENEMDU_2016,
-                       ENEMDU_2017, ENEMDU_2018)
 
 # Aplicar la función a cada base de datos usando lapply
 
