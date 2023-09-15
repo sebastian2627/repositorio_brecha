@@ -49,22 +49,21 @@ bases <- list(ENEMDU_2007, ENEMDU_2008, ENEMDU_2009, ENEMDU_2010, ENEMDU_2011,
               ENEMDU_2012, ENEMDU_2013, ENEMDU_2014, ENEMDU_2015, ENEMDU_2016,
               ENEMDU_2017, ENEMDU_2018)
 
-# Función para convertir la variable "estrato" de character a numeric en un data frame dado
+# Definir una función para convertir la columna "estrato" a double en un data frame dado
 
-convertir_estrato_a_numeric <- function(df) {
-  df$estrato <- as.numeric(df$estrato)
-  return(df)
+convertir_estrato_a_double <- function(data) {
+  data$estrato <- as.double(data$estrato)
+  return(data)
 }
 
-# Aplicar la función a cada data frame en la lista
+# Aplicar la función a cada base de datos en la lista
 
-lista_dataframes <- lapply(bases, convertir_estrato_a_numeric)
-
+bases <- lapply(bases, convertir_estrato_a_double)
 
 # Definir una función para seleccionar las variables deseadas de las ENEMDU
 
 vars <- function(data) {
-  return(data[, c("p02", "p01", "p03", "p06", "p24", "p45", "ingrl", "nnivins", "periodo", "fexp", "upm","estrato")])
+  return(data[, c("p02", "p01", "p03", "p06", "p24", "p45", "ingrl", "nnivins", "periodo", "fexp", "upm", "estrato")])
 }
 
 # Aplicar la función a cada base de datos usando lapply
