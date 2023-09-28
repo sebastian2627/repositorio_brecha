@@ -93,7 +93,7 @@ df_bases <- ENEMDU_TOT %>%
          experiencia_laboral > 0, experiencia_laboral < 99,
          ingreso_laboral > 0, ingreso_laboral < 999999,
          estado_civil %in% c(1,6)) %>%
-  mutate(sexo = factor(sexo, levels = c(1:2), labels = c("Hombre", "Mujer")),
+  mutate(Sexo = factor(sexo, levels = c(1:2), labels = c("Hombre", "Mujer")),
          estado_civil = factor(estado_civil, levels = c(1,6), labels = c("Casado", "Soltero")),
          nivel_instruccion = factor(nivel_instruccion, levels = c(1:5), labels = c("Ninguno",
                                                                                    "Centro de alfabetizacion",
@@ -116,7 +116,7 @@ dm <- svydesign(ids = ~ upm,
 
 mediana_tab <- svyby(
   formula = ~ ingreso_laboral,
-  by = ~ fecha_1 + sexo,
+  by = ~ fecha_1 + Sexo,
   design = dm,
   FUN = svyquantile,
   quantiles = 0.5,  
@@ -126,7 +126,7 @@ mediana_tab <- svyby(
 
 # visualizacion de la mediana con pesos ------------------------------------------------------------------------------------------------
 
-graf_sueldop <- ggplot(mediana_tab, aes(fecha_1, ingreso_laboral, color = sexo)) +
+graf_sueldop <- ggplot(mediana_tab, aes(fecha_1, ingreso_laboral, color = Sexo)) +
   geom_line() +
   geom_point(color = 'black') +
   scale_color_manual(values = c("#FFAC8E","#647A8F")) +
@@ -142,7 +142,7 @@ graf_sueldop <- ggplot(mediana_tab, aes(fecha_1, ingreso_laboral, color = sexo))
 
 hr_tab <- svyby(
   formula = ~ horas_trabajadas,
-  by = ~ fecha_1 + sexo,
+  by = ~ fecha_1 + Sexo,
   design = dm,
   FUN = svymean,
   na.rm = TRUE,
@@ -151,14 +151,14 @@ hr_tab <- svyby(
     horas_trabajadas <= 60
 )
 
-inhr <- full_join(mediana_tab, hr_tab, by = c("fecha_1", "sexo"))
+inhr <- full_join(mediana_tab, hr_tab, by = c("fecha_1", "Sexo"))
 
 inhr <- inhr %>%
   mutate(ingreso_hora = ingreso_laboral/horas_trabajadas)
 
 # visualizacion horas ------------------------------------------------------------------------------------------------
 
-graf_horasp <- ggplot(inhr, aes(fecha_1, ingreso_hora, color = sexo)) +
+graf_horasp <- ggplot(inhr, aes(fecha_1, ingreso_hora, color = Sexo)) +
   geom_line() +
   geom_point(color = 'black') +
   scale_color_manual(values = c("#FFAC8E","#647A8F")) +
@@ -174,7 +174,7 @@ graf_horasp <- ggplot(inhr, aes(fecha_1, ingreso_hora, color = sexo)) +
 
 cv_tab <- svyby(
   formula = ~ ingreso_laboral,
-  by = ~ fecha_1 + sexo + estado_civil,
+  by = ~ fecha_1 + Sexo + estado_civil,
   design = dm,
   FUN = svyquantile,
   quantiles = 0.5,
@@ -185,7 +185,7 @@ cv_tab <- svyby(
 
 # Visualizacion salario por estado civil con pesos ------------------------------------------------------------------------------------------------
 
-graf_estp <- ggplot(cv_tab, aes(fecha_1, ingreso_laboral, color = sexo)) +
+graf_estp <- ggplot(cv_tab, aes(fecha_1, ingreso_laboral, color = Sexo)) +
   geom_line() +
   geom_point(color = 'black') +
   scale_color_manual(values = c("#FFAC8E","#647A8F")) +
@@ -201,7 +201,7 @@ graf_estp <- ggplot(cv_tab, aes(fecha_1, ingreso_laboral, color = sexo)) +
 
 educ_tab <- svyby(
   formula = ~ nivel_instruccion,
-  by = ~ fecha_1 + sexo,
+  by = ~ fecha_1 + Sexo,
   design = dm,
   FUN = svymean,
   na.rm = TRUE,
@@ -212,7 +212,7 @@ educ_tab <- svyby(
 
 ciiu_tab <- svyby(
   formula = ~ ciiu4,
-  by = ~ fecha_1 + sexo,
+  by = ~ fecha_1 + Sexo,
   design = dm,
   FUN = svymean,
   na.rm = TRUE,
@@ -226,7 +226,7 @@ df_median_en <-
   filter(!nivel_instruccion %in% c("Ninguno",
                                    "Centro de alfabetizacion")) %>%
   mutate(fecha_1= as.Date(paste0(ano, "01"), format = "%Y%m%d")) %>%
-  group_by(fecha_1, sexo) %>%
+  group_by(fecha_1, Sexo) %>%
   summarise(sueldo_mediano = median(ingreso_laboral, na.rm = TRUE))
 
 # Analisis horas trabajadas ------------------------------------------------------------------------------------------------
@@ -236,7 +236,7 @@ df_horas <-
   filter(horas_trabajadas <= 60, !nivel_instruccion %in% c("Ninguno",
                                                            "Centro de alfabetizacion")) %>%
   mutate(fecha_1= as.Date(paste0(ano, "01"), format = "%Y%m%d")) %>%
-  group_by(fecha_1, sexo) %>%
+  group_by(fecha_1, Sexo) %>%
   summarise(horas_promedio = mean(horas_trabajadas, na.rm = TRUE),
             ing_med = median(ingreso_laboral, na.rm = TRUE),
             salario_hora = ing_med/horas_promedio)
@@ -247,7 +247,7 @@ df_educacion <-
   df_bases %>%
   filter(!nivel_instruccion %in% c('Ninguno', 'Centro de alfabetizacion')) %>%
   mutate(fecha_1= as.Date(paste0(ano, "01"), format = "%Y%m%d")) %>%
-  group_by(fecha_1,sexo, nivel_instruccion) %>%
+  group_by(fecha_1,Sexo, nivel_instruccion) %>%
   summarize(persona = n()) %>%
   mutate(porcentaje_persona = persona/sum(persona))
 
@@ -258,7 +258,7 @@ df_median_enen <-
   filter(!nivel_instruccion %in% c("Ninguno",
                                    "Centro de alfabetizacion")) %>%
   mutate(fecha_1= as.Date(paste0(ano, "01"), format = "%Y%m%d")) %>%
-  group_by(fecha_1, sexo, estado_civil) %>%
+  group_by(fecha_1, Sexo, estado_civil) %>%
   summarise(sueldo_mediano = median(ingreso_laboral, na.rm = TRUE))
 
 # base de la mediana por ciiu ------------------------------------------------------------------------------------------------
@@ -286,7 +286,7 @@ df_ciiu <-
                                     "Organizaciones internacionales" = "21",
                                     "Otro" = "22"),
          fecha_1= as.Date(paste0(ano, "01"), format = "%Y%m%d")) %>%
-  group_by(fecha_1,ciiu4, sexo) %>% 
+  group_by(fecha_1,ciiu4, Sexo) %>% 
   summarize(empleo = n()) %>%
   mutate(porcentaje_empleo = empleo/sum(empleo))
 
@@ -353,7 +353,7 @@ superior para ser ejercidas. Fuente: Instituto Nacional de Estadística y Censos
 
 # visualizacion de la mediana ------------------------------------------------------------------------------------------------
 
-graf_sueldo <- ggplot(df_median_en, aes(fecha_1, sueldo_mediano, color = sexo)) +
+graf_sueldo <- ggplot(df_median_en, aes(fecha_1, sueldo_mediano, color = Sexo)) +
   geom_line() +
   geom_point(color = 'black') +
   scale_color_manual(values = c("#FFAC8E","#647A8F")) +
@@ -367,7 +367,7 @@ graf_sueldo <- ggplot(df_median_en, aes(fecha_1, sueldo_mediano, color = sexo)) 
 
 # Visualizacion salario por estado civil ------------------------------------------------------------------------------------------------
 
-graf_est <- ggplot(df_median_enen, aes(fecha_1, sueldo_mediano, color = sexo)) +
+graf_est <- ggplot(df_median_enen, aes(fecha_1, sueldo_mediano, color = Sexo)) +
   geom_line() +
   geom_point(color = 'black') +
   scale_color_manual(values = c("#FFAC8E","#647A8F")) +
@@ -381,7 +381,7 @@ graf_est <- ggplot(df_median_enen, aes(fecha_1, sueldo_mediano, color = sexo)) +
 
 # visualizacion horas ------------------------------------------------------------------------------------------------
 
-graf_horas <- ggplot(df_horas, aes(fecha_1, salario_hora, color = sexo)) +
+graf_horas <- ggplot(df_horas, aes(fecha_1, salario_hora, color = Sexo)) +
   geom_line() +
   geom_point(color = 'black') +
   scale_color_manual(values = c("#FFAC8E","#647A8F")) +
@@ -399,7 +399,7 @@ graf_eduacion <- ggplot(df_educacion, aes(x = fecha_1, y = porcentaje_persona, c
   geom_line() +
   geom_point(color = 'black') +
   scale_color_manual(values = c("#FFAC8E","#647A8F", "#7bd9f2")) +
-  facet_wrap(~sexo) +
+  facet_wrap(~Sexo) +
   labs(x = "",
        y = "",
        title = "Evolucion porcentual del nivel de instrucción de hombres y mujeres en el mercado laboral 2008-2018",
@@ -417,7 +417,7 @@ graf_ciiu <- ggplot(df_ciiu %>% filter(ciiu4 %in% c("Enseñanza",
                     aes(fecha_1, porcentaje_empleo, fill = ciiu4)) +
   geom_bar(stat = "identity",
            position = "fill") +
-  facet_wrap(~sexo)  +
+  facet_wrap(~Sexo)  +
   scale_fill_manual(values = c("#FFAC8E", '#2E5994', '#09A4CC','#FFB6C1','#DCBEE6')) +
   labs(x = "",
        y = "",
