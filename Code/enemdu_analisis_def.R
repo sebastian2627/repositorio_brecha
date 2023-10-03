@@ -338,14 +338,20 @@ del ingreso laboral que se encuentra en el medio de todo el conjunto de datos, d
 trabajadores del sector formal ganan más que la mediana del ingreso laboral, mientras que la otra mitad gana menos.
 Fuente: Instituto Nacional de Estadística y Censos (INEC), www.ecuadorencifras.gob.ec"
 
-caption_est <- "Fuente: Instituto Nacional de Estadística y Censos (INEC), www.ecuadorencifras.gob.ec"
+caption_est <- "Para la realización de este gráfico, se dividió las proporciones de hombres y mujeres entre 2008-2018, 
+con respecto de su estado civil con el objetivo de ver la mediana de los salarios entre estos dos grupos con este control. 
+Las diferencias observadas son especialmente interesantes, ya que se adaptan al fenómeno de la maternidad y prospectos laborales 
+entre géneros.Fuente: Instituto Nacional de Estadística y Censos (INEC), www.ecuadorencifras.gob.ec"
 
 caption_horas <- "Nota: Se decidió dividir la mediana del ingreso laboral por el promedio de horas trabajadas para
 hombres y mujeres debido que se descubrió que, en promedio, los hombres trabajan más que las mujeres. 
 Por lo que las remuneraciones se debían ajustar también por esta variable endógena. 
 Fuente: Instituto Nacional de Estadística y Censos (INEC), www.ecuadorencifras.gob.ec"
 
-caption_educ <- "Fuente: Instituto Nacional de Estadística y Censos (INEC), www.ecuadorencifras.gob.ec"
+caption_educ <- "Para la realización de este gráfico, se tomó la evolución de la proporción del nivel de educación (superior, media y básica)
+entre hombres y mujeres en el mercado laboral. Con el objetivo de encontrar diferencias cuantitativas que se puedan relacionar
+con las divergencias en las remuneraciones de estos dos grupos.Fuente: Instituto Nacional de Estadística y Censos (INEC),
+www.ecuadorencifras.gob.ec"
 
 caption_ciiu <- "Nota: Se tomaron en cuenta cinco industrias del Ecuador que han ofrecido las más altas remuneraciones 
 laborales en años prepandemia y que son a la vez, actividades productivas que requieren en su mayoría títulos de nivel 
@@ -395,15 +401,14 @@ graf_horas <- ggplot(df_horas, aes(fecha_1, salario_hora, color = Sexo)) +
 
 # Visualizacion educacion ------------------------------------------------------------------------------------------------
 
-graf_eduacion <- ggplot(df_educacion, aes(x = fecha_1, y = porcentaje_persona, color = nivel_instruccion)) +
-  geom_line() +
-  geom_point(color = 'black') +
-  scale_color_manual(values = c("#FFAC8E","#647A8F", "#7bd9f2")) +
+graf_eduacion <- ggplot(df_educacion, aes(x = fecha_1, y = porcentaje_persona, fill = nivel_instruccion)) +
+  geom_area(position = "stack") + 
+  scale_fill_manual(values = c("#FFAC8E","#647A8F", "#7bd9f2")) +
   facet_wrap(~Sexo) +
   labs(x = "",
        y = "",
-       title = "Evolucion porcentual del nivel de instrucción de hombres y mujeres en el mercado laboral 2008-2018",
-       color = "Nivel de instrucción",
+       title = "Evolución de las proporciones de personas en diferentes niveles de instrucción entre hombres y mujeres en el mercado laboral 2008-2018",
+       fill = "Nivel de instrucción",
        caption = str_wrap(caption_educ, 160)) +
   theme_ress
 
@@ -473,7 +478,7 @@ ggsave("figures/grafico_horas.png",
 ggsave("figures/grafico_educ.png", 
        plot = graf_eduacion,
        device = "png",
-       width = 12,
+       width = 18,
        height = 8,
        dpi = 1200)
 
