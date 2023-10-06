@@ -1,0 +1,91 @@
+---
+title: "Un acercamiento cuantitativo a la brecha salarial "
+author: "Sebastián Morales"
+date: "2023-10-06"
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
+bibliography: referencias.bib
+csl: style.csl
+---
+
+```{r setup, include = FALSE}
+# Opciones de chunks
+knitr::opts_chunk$set(echo = F)
+```
+
+La discriminación por criterios identitarios, es decir, exclusión o trato desigual por características innatas de un individuo (raza, género, orientación sexual, etc.) es uno de los problemas que Ecuador, en menor o mayor medida, todavía tiene que lidiar, por ser ilegítima e inmoral “Las políticas diseñadas para abordar los problemas de racismo y discriminación en la sociedad ecuatoriana han influenciado ciertos aspectos esenciales tales como la normativa, pero aún distan de incidir decisivamente en problemas estructurales” [@oviedo_ecuador_2022] . Mas en particular, la discriminación por género y su manifestación más conocida, la brecha salarial, es un tópico que ha cobrado mucha relevancia ante la opinión pública estos últimos años. No obstante, se hace necesario revisar qué nos dicen los datos sobre las diferencias salariales, con el objetivo de tener un análisis más aterrizado sobre la situación real de esta problemática en términos cuantitativos como cualitativos.
+
+En este artículo se tratará de dar algo de luz a ciertos aspectos que pueden pasarse por alto cuando las estadísticas sociales y económicas se miran de forma superficial. Se ha utilizado las bases de la ENEMDU (Encuesta Nacional de Empleo, Desempleo y Subempleo) desde 2007 hasta 2018 con la intención de identificar las diferencias cuantitativas laborales de hombres y mujeres como la variación de horas trabajadas por semana, nivel de instrucción y estado civil entre estos dos grupos, con el fin de observar los diferentes factores que la teoría económica propone como potenciales causantes de brechas. 
+
+# Mediana de los salarios de hombres y mujeres
+
+Cuando se da un vistazo sobre la evolución de la mediana de los salarios de hombres y mujeres en cualquier país occidental del mundo, siempre se observan disparidades a favor de los hombres. Ecuador no es la excepción, ya que en este país se encuentra una diferencia relativamente constante en el periodo comprendido entre 2007-2018. 
+
+```{r}
+knitr::include_graphics('figures/graf_sueldop.png')
+```
+
+Como se puede ver en el gráfico, las mujeres ganan un 11% menos que los hombres en términos de la mediana del salario mensual. Esta diferencia de resultados da mucho para analizar, pues como se mencionó anteriormente, se compone de varios factores. Primero, hay que recordar que los hombres históricamente han accedido en mayor proporción al mercado laboral que las mujeres debido a factores que son denominados como roles de género. Los hogares tienden a distribuir las obligaciones de manera que son los hombres quienes entran al mercado laboral mientras que las mujeres dedican su tiempo al cuidado del hogar.
+
+Por ejemplo, según un artículo antiguo de El Quantificador, mientras que un 73% del trabajo no remunerado lo realizan las mujeres, el 23% lo realizan los hombres [@christian_salas_hombres_2022]. Esto puede producir que las mujeres dediquen menos horas a sus empleos remunerados. Además, cabe recalcar que las mujeres que eligen ser madres, según un artículo de The Economist, no solo tienden a escoger trabajar menos horas, sino trabajos peor pagados pero que sean amigables con el cuidado de los hijos [@the_economist_how_nodate]. A esto se lo conoce como “penalidad de la maternidad”, ya que al estar desigualmente distribuidas las tareas relacionadas a esta condición, la productividad de los puestos de trabajo ocupados por algunas mujeres que deciden priorizar la maternidad, es baja o en su defecto, la productividad laboral de algunas mujeres que deciden ser madres se reduce gracias a este cambio en las preferencias. Cabe recordar que según la teoría económica, la productividad laboral es un factor determinante en la composición de las remuneraciones que ganan los trabajadores. [@sebastian_morales_perspectivas_2023]
+
+En consecuencia, aquí encontramos la primera diferencia cualitativa: los hombres trabajan de media más horas a la semana que las mujeres. Algo que es sumamente importante a tener en cuenta porque así, a la hora de calcular el ingreso laboral por hora, es donde nos encontramos que las diferencias se reducen en gran medida e incluso beneficiando ligeramente a las mujeres (algo que se profundizará más adelante). En la gráfica se puede observar que la brecha ahora a favor de las mujeres es del 1.25% en el año 2018.
+
+```{r}
+knitr::include_graphics('figures/graf_horasp.png')
+```
+
+# Mediana de los salarios de hombres y mujeres
+
+Ahora bien, podemos seguir cuestionando el impacto que tiene el matrimonio dentro de los ingresos laborales de hombres y mujeres. No en vano, se explicó anteriormente que la penalización por tener un hijo afecta en mayor medida a las mujeres pero ¿Qué ocurre con los hombres en esa misma situación? 
+
+```{r}
+knitr::include_graphics('figures/graf_estp.png')
+```
+
+ Este gráfico nos enseña dos hechos llamativos: 
+
+1. Los ingresos laborales de hombres casados son mayores a los de hombres solteros como de mujeres casadas y solteras.
+
+2. La brecha es muy pequeña cuando se toman en cuenta los ingresos laborales de hombres y mujeres solteros.
+
+3. La brecha entre hombres y mujeres solteros se invierte de manera que es a favor de las mujeres, siendo para el último dato de 2018, una diferencia del 5.25%
+
+Con este control, se puede deducir que gran parte de la brecha por la mediana de ingresos laborales del primer gráfico es casi completamente explicada por el ingreso laboral de hombres casados. Puede que las causas cualitativas detrás de esto sean que a la vez que las mujeres casadas escogen dedicarse a gozar de la maternidad y realizar demás labores no remunerados los hombres casados en contraste, eligen trabajar más horas y/o aceptar puestos de mayor responsabilidad en las empresas [@parker_chapter_2013]. Con esto se quiere decir que no necesariamente se coacciona a la mujer a trabajar menos horas por dedicarse a la maternidad, sino que, en muchos casos, esta es una elección acordada por ambas partes.  
+
+# Instrucción y sectores económicos
+
+Volviendo brevemente a los gráficos, usted podrá recordar que existe una diferencia de 1.25% a favor de las mujeres en los salarios por hora y del 5.25% a favor de las mujeres solteras. Esto es algo llamativo, considerando que se aclaró previamente que las mujeres, en promedio, dedican menos horas a sus empleos remunerados. La respuesta puede que esté en el nivel de instrucción de hombres y mujeres en el mercado laboral, así como el sector económico en el que se aplican esos conocimientos. 
+
+Por el lado de la educación, no es de sorprender que sea un determinante en el nivel de ingresos de una persona. Naturalmente, existe una diversidad de factores que pueden influir en el salario de un individuo y en ciertas instancias, un título universitario no puede asegurar un gran trabajo. No obstante, la inversión que los trabajadores hacen en mejorar su capital humano a través de instituciones como universidades, institutos técnicos, etc. son una buena inversión en la mayoría de los casos [@george_borjas_labor_2004]. Entonces, las diferencias en el nivel de ingresos laborales por hora de mujeres y hombres pueden venir de esta fuente.
+
+```{r}
+knitr::include_graphics('figures/grafico_educ.png')
+```
+
+Efectivamente, nos encontramos que las mujeres que entran al mercado laboral, con los años, han tendido a tener cada vez más títulos de nivel superior. Igualmente, esta narrativa haría sentido con la proporción de hombres y mujeres en puestos de trabajos referentes a las diferentes actividades productivas del Ecuador. Con esto se quiere decir que, al existir el escenario donde muchas mujeres dentro del mercado laboral tienen títulos universitarios o superiores, entonces las actividades productivas que requieran titulación superior serían dominadas por mujeres. 
+
+```{r}
+knitr::include_graphics('figures/grafico_ciiu.png')
+```
+
+Dando una revisión al gráfico de arriba, se puede constatar que en efecto en industrias que requieren de un título de nivel superior que son dominadas por mujeres. Tan solo la industria minero-energética y servicios públicos, defensa y saneamiento son ampliamente dominadas por hombres. Por otra parte, si bien no existe una proporción muy mayoritaria en la industria concerniente a actividades financieras y de seguros, si existe un número considerablemente alto de mujeres en las industrias relacionadas con la enseñanza y salud y asistencia. Esto es importante ya que dentro de estas cinco actividades se encuentran los salarios y remuneraciones más altos entre todas las industrias.
+
+# Conclusión 
+
+A pesar de que a primera vista, sí existe una brecha salarial entre hombres y mujeres, es necesario matizar este hecho. Por un lado, si se descompone la brecha en salarios por hora, se hace evidente una reducción importante en esa diferencia ya que las mujeres en promedio trabajan menos horas que los hombres, haciendo que incluso esta se revierta, favoreciendo a las mujeres. 
+
+Por otro lado, si se toma en cuenta el estado civil de estos grupos, también se observan hechos interesantes. Principalmente: el salario de los hombres casados es el más alto y la brecha entre hombres y mujeres solteros muy pequeña, favoreciendo a las mujeres. A este hecho se le puede dar explicación mediante factores cualitativos como lo son la maternidad y sus efectos en los prospectos profesionales de las mujeres. 
+
+Asimismo, es interesante ver que existe un gran número de mujeres en el mercado laboral con títulos superiores en comparación a los hombres. Esto es algo que hace sentido con que proporcionalmente, las mujeres dominan algunos sectores productivos altamente remunerados que en su mayoría requieren un título para poder ser ejercidos. Esto podría explicar por qué existe una brecha a favor de las mujeres cuando se toma en cuenta el salario por hora.
+
+La discriminación, tristemente, suele estar más comoda en la oscuridad, en donde puede mantenerse anónima y la estadística no puede traerla a la luz. Todavía cabe la posibilidad que existan techos de cristal que limiten el desempeño laboral de las mujeres por motivos de género, además de que no podemos observar las razones por las que las mujeres no deciden trabajar más horas, no pueden superar los roles de género, aun tomando en cuenta que están mejor educadas o ganan, por hora, aparentemente más que un hombre. Adicionalmente, factores como la penalidad del mercado laboral a la maternidad son ampliamente discriminatorios, incluso hacia mujeres que no son madres pero están en edad de serlo , y las políticas laborales del Ecuador podrían empeorar el problema más que solventarlo. 
+
+# Referencias
+
+
+
+
+
