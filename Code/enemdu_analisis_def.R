@@ -402,12 +402,26 @@ graf_horas <- ggplot(df_horas, aes(fecha_1, salario_hora, color = Sexo)) +
 # Visualizacion educacion ------------------------------------------------------------------------------------------------
 
 graf_eduacion <- ggplot(df_educacion, aes(x = fecha_1, y = porcentaje_persona, fill = nivel_instruccion)) +
-  geom_area(position = "stack") + 
+  geom_bar(stat = "identity",
+           position = "fill") + 
   scale_fill_manual(values = c("#FFAC8E","#647A8F", "#7bd9f2")) +
   facet_wrap(~Sexo) +
   labs(x = "",
        y = "",
        title = "Evolución de las proporciones de personas en diferentes niveles de instrucción entre hombres y mujeres en el mercado laboral 2008-2018",
+       fill = "Nivel de instrucción",
+       caption = str_wrap(caption_educ, 160)) +
+  theme_ress
+
+# Visualizacion educacion 2 ------------------------------------------------------------------------------------------------
+
+graf_eduacionper <- ggplot(df_educacion, aes(x = fecha_1, y = persona, fill = nivel_instruccion)) +
+  geom_area(position = "stack") + 
+  scale_fill_manual(values = c("#FFAC8E","#647A8F", "#7bd9f2")) +
+  facet_wrap(~Sexo) +
+  labs(x = "",
+       y = "",
+       title = "Evolución del número de personas en diferentes niveles de instrucción entre hombres y mujeres en el mercado laboral 2008-2018",
        fill = "Nivel de instrucción",
        caption = str_wrap(caption_educ, 160)) +
   theme_ress
