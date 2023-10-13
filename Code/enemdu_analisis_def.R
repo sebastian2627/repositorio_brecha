@@ -348,10 +348,10 @@ hombres y mujeres debido que se descubrió que, en promedio, los hombres trabaja
 Por lo que las remuneraciones se debían ajustar también por esta variable endógena. 
 Fuente: Instituto Nacional de Estadística y Censos (INEC), www.ecuadorencifras.gob.ec"
 
-caption_educ <- "Para la realización de este gráfico, se tomó la evolución de la proporción del nivel de educación (superior, media y básica)
-entre hombres y mujeres en el mercado laboral. Con el objetivo de encontrar diferencias cuantitativas que se puedan relacionar
-con las divergencias en las remuneraciones de estos dos grupos.Fuente: Instituto Nacional de Estadística y Censos (INEC),
-www.ecuadorencifras.gob.ec"
+caption_educ <- 'Nota: En este gráfico se realizó la evolución del número entre hombres y mujeres en el mercado laboral con respecto a su 
+nivel de instrucción (básica, media, superior). Con el objetivo de encontrar diferencias cuantitativas que se puedan 
+relacionar con las divergencias en las remuneraciones de estos dos grupos. Fuente: Instituto Nacional de Estadística y 
+Censos (INEC). www.ecuadorencifras.gob.ec'
 
 caption_ciiu <- "Nota: Se tomaron en cuenta cinco industrias del Ecuador que han ofrecido las más altas remuneraciones 
 laborales en años prepandemia y que son a la vez, actividades productivas que requieren en su mayoría títulos de nivel 
@@ -400,20 +400,6 @@ graf_horas <- ggplot(df_horas, aes(fecha_1, salario_hora, color = Sexo)) +
         axis.text.y = element_text(size = 12))
 
 # Visualizacion educacion ------------------------------------------------------------------------------------------------
-
-graf_eduacion <- ggplot(df_educacion, aes(x = fecha_1, y = porcentaje_persona, fill = nivel_instruccion)) +
-  geom_bar(stat = "identity",
-           position = "fill") + 
-  scale_fill_manual(values = c("#FFAC8E","#647A8F", "#7bd9f2")) +
-  facet_wrap(~Sexo) +
-  labs(x = "",
-       y = "",
-       title = "Evolución de las proporciones de personas en diferentes niveles de instrucción entre hombres y mujeres en el mercado laboral 2008-2018",
-       fill = "Nivel de instrucción",
-       caption = str_wrap(caption_educ, 160)) +
-  theme_ress
-
-# Visualizacion educacion 2 ------------------------------------------------------------------------------------------------
 
 graf_eduacionper <- ggplot(df_educacion, aes(x = fecha_1, y = persona, fill = nivel_instruccion)) +
   geom_area(position = "stack") + 
@@ -490,7 +476,7 @@ ggsave("figures/grafico_horas.png",
        dpi = 1200)
 
 ggsave("figures/grafico_educ.png", 
-       plot = graf_eduacion,
+       plot = graf_eduacionper,
        device = "png",
        width = 18,
        height = 8,

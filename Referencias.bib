@@ -1,92 +1,127 @@
 
-@book{george_borjas_labor_2004,
-	address = {New York. Estados Unidos de Norteamérica},
-	edition = {tercera},
-	title = {Labor economics {\textbar}},
-	isbn = {978-0-07-111097-6},
-	url = {http://www.marcialpons.es/libros/labor-economics/9780071110976/},
-	abstract = {ÍNDICE:1. Introduction. 2. Labor Supply. 3. Topics in Labor Supply. 4. Labor Demand. 5. Labor Market Equilibrium. 6. Compensating Wage Differentials. 7. Human Capital. 8. ...},
-	language = {es},
-	urldate = {2023-09-03},
-	publisher = {McGraw-Hill Publishing Co.},
-	author = {{George Borjas}},
-	year = {2004},
-	file = {Snapshot:files/6/9780071110976.html:text/html},
+# Analisis empleo por ciiu
+
+# Preliminares --------------------------------------------------------------------------------------------
+
+# Cargar librerias
+
+if(!require(dplyr)) install.packages("dplyr", repos = "http://cran.us.r-project.org")
+if(!require(readxl)) install.packages("readxl", repos = "http://cran.us.r-project.org")
+if(!require(ggplot2)) install.packages("ggplot2", repos = "http://cran.us.r-project.org")
+if(!require(readr)) install.packages("readr", repos = "http://cran.us.r-project.org")
+if(!require(forcats)) install.packages("forcats", repos = "http://cran.us.r-project.org")
+if(!require(lubridate)) install.packages("lubridate", repos = "http://cran.us.r-project.org")
+if(!require(tidyverse)) install.packages("tidyverse", repos = "http://cran.us.r-project.org")
+if(!require(patchwork)) install.packages("patchwork", repos = "http://cran.us.r-project.org")
+if(!require(scales)) install.packages("scales", repos = "http://cran.us.r-project.org")
+if(!require(png)) install.packages("png", repos = "http://cran.us.r-project.org")
+if(!require(webp)) install.packages("webp", repos = "http://cran.us.r-project.org")
+if(!require(openxlsx)) install.packages("openxlsx", repos = "http://cran.us.r-project.org")
+
+# Análisis ------------------------------------------------------------------------------------------------
+
+df_ress <- 
+  ress_raw %>%  
+  select(ano, mes, provincia, edad, sueldo , dias, empleo_total, ciiu4_1, empleo) %>% 
+  filter(provincia %in% seq(1:24), sueldo>0) %>%
+  mutate(ciiu4_1_fct = as.factor(ciiu4_1),
+         ciiu4_fct = fct_collapse(ciiu4_1_fct,
+                                  "Agricultura, ganadería,  silvicultura y pesca" = "A",
+                                  "Explotación de minas y canteras" = "B",
+                                  "Industrias manufactureras" = "C",
+                                  "Suministro de electricidad, gas, vapor y aire acondicionado" = "D",
+                                  "Distribución de agua; alcantarillado, gestión de desechos y actividades de saneamiento." = "E",
+                                  "Construcción" = "F",
+                                  "Comercio al por mayor y al por menor; reparación de vehículos automotores y motocicletas" = "G",
+                                  "Transporte y almacenamiento" = "H",
+                                  "Actividades de alojamiento y de servicio de comidas" = "I",
+                                  "Información y comunicación" = "J",
+                                  "Actividades financieras y de seguros" = "K",
+                                  "Actividades inmobiliarias" = "L",
+                                  "Actividades profesionales, científicas y técnicas" = "M",
+                                  "Actividades de servicios administrativos y de apoyo" = "N",
+                                  "Administración pública y defensa; planes de seguridad social de afiliación obligatoria" = "O",
+                                  "Enseñanza" = "P",
+                                  "Actividades de atención de la salud humana y de asistencia social" = "Q",
+                                  "Artes, entretenimiento y recreación" = "R",
+                                  "Otras actividades de servicios" = "S",
+                                  "Actividades de los hogares como empleadores; actividades no diferenciadas de los hogares como productores de bienes y servicios para uso propio" = "T",
+                                  "Organizaciones internacionales" = "U",
+                                  "Otro" = "Z0_Nocla_CIIU")) 
+
+# agrupando la base por actividad productiva -----
+
+df_ciiu <- 
+  df_ress %>% 
+  filter(ano == 2023, mes == 3) %>% 
+  group_by(ciiu4_fct,ciiu4_1_fct) %>% 
+  summarize(empleo = n())
+
+# Exportar df_ciiu a Excel
+
+write.xlsx(df_ciiu, "df_ciiu.xlsx")
+
+# Base para la evolucion de la tasa de empleo formal por sector-----
+
+df_empleo_1 <- 
+  df_ress %>%
+  mutate(fecha_1= paste("01", paste(mes,ano, sep = '-')) %>% dmy()) %>%
+  group_by(fecha_1) %>%
+  summarise(empleo = n())
+
+# Exportar df_empleo_1 a Excel
+
+write.xlsx(df_empleo_1, "df_empleo_1.xlsx")
+
+# agrupando la base por actividad productiva -----
+
+df_ciiugr <- 
+  df_ress %>%
+  filter(ciiu4_fct %in% c('Administración pública y defensa; planes de seguridad social de afiliación obligatoria',
+                            'Comercio al por mayor y al por menor; reparación de vehículos automotores y motocicletas',
+                            'Industrias manufactureras',
+                            'Agricultura, ganadería,  silvicultura y pesca',
+                            'Actividades de servicios administrativos y de apoyo')) %>%
+  group_by(ciiu4_1_fct, ciiu4_fct) %>%
+  summarize(empleo = n()) %>%
+  arrange(desc(empleo))
+
+# Exportar df_ciiugr a Excel
+
+write.xlsx(df_ciiugr, "df_ciiugr.xlsx")
+
+# Base para la evolucion de la tasa de empleo formal por los cinco ciiu mas grandes-----
+
+df_empleo_ciiu <- 
+  df_ress %>%
+  mutate(fecha_1= paste("01", paste(mes,ano, sep = '-')) %>% dmy()) %>%
+  filter(ciiu4_fct %in% c('Administración pública y defensa; planes de seguridad social de afiliación obligatoria',
+                          'Comercio al por mayor y al por menor; reparación de vehículos automotores y motocicletas',
+                          'Industrias manufactureras',
+                          'Agricultura, ganadería,  silvicultura y pesca',
+                          'Actividades de servicios administrativos y de apoyo')) %>%
+  group_by(fecha_1,ciiu4_1_fct, ciiu4_fct) %>%
+  summarise(empleo = n())
+
+# Exportar df_ciiugr a Excel
+
+write.xlsx(df_empleo_ciiu, "df_empleo_ciiu.xlsx")
+
+# Especificar los nombres de los archivos de salida y los data frames
+
+nombres_archivos <- c("df_ciiu.xlsx", "df_empleo_1.xlsx", "df_ciiugr.xlsx", "df_empleo_ciiu.xlsx")
+data_frames <- list(df_ciiu, df_empleo_1, df_ciiugr, df_empleo_ciiu)
+
+# Crea un nuevo archivo Excel
+
+wb <- createWorkbook()
+
+# Escribir cada data frame en una hoja de Excel separada
+
+for (i in 1:length(nombres_archivos)) {
+  addWorksheet(wb, sheetName = nombres_archivos[i])
+  write.xlsx(data_frames[[i]], wb, sheet = nombres_archivos[i])
 }
 
-@article{the_economist_how_nodate,
-	title = {How big is the wage penalty for mothers?},
-	issn = {0013-0613},
-	url = {https://www.economist.com/graphic-detail/2019/01/28/how-big-is-the-wage-penalty-for-mothers},
-	urldate = {2023-09-29},
-	journal = {The Economist},
-	author = {{The Economist}},
-	file = {The Economist Snapshot:files/10/how-big-is-the-wage-penalty-for-mothers.html:text/html},
-}
-
-@article{oviedo_ecuador_2022,
-	title = {Ecuador: racismo y discriminación étnica en el vaivén de la política pública},
-	volume = {9},
-	copyright = {Reconocimiento - Sin Obra Derivada 3.0 Unported License},
-	issn = {2661-9075},
-	shorttitle = {Ecuador},
-	url = {https://revistas.flacsoandes.edu.ec/mundosplurales/article/view/5483},
-	doi = {10.17141/mundosplurales.2.2022.5483},
-	abstract = {Esta revista es un foro abierto a investigadores para contribuir al desarrollo y la difusión de la reflexión teórica y metodológica dedicada al análisis y evaluación de las políticas públicas, la gestión pública y la gobernanza, particularmente a partir de las experiencias de América Latina. La revista publica resultados de investigaciones empíricas y teóricas relacionadas con la acción pública, de tipo cualitativo y/o cuantitativo, con un especial interés en los trabajos realizados desde una perspectiva crítica, comparada, inter y transdisciplinaria que apunte a la construcción de políticas públicas pluralistas.},
-	language = {es},
-	number = {2},
-	urldate = {2023-09-29},
-	journal = {Mundos Plurales - Revista Latinoamericana de Políticas y Acción Pública},
-	author = {Oviedo, Alexis Oviedo},
-	month = oct,
-	year = {2022},
-	note = {Number: 2
-Publisher: FLACSO ECUADOR},
-	keywords = {Ciencias Sociales, Journal, Políticas y Asuntos Públicos latinoamericanos, Revista Académica, sociedad},
-	file = {Full Text PDF:files/12/Oviedo - 2022 - Ecuador racismo y discriminación étnica en el vai.pdf:application/pdf},
-}
-
-@misc{christian_salas_hombres_2022,
-	title = {Los hombres ecuatorianos dedican cada vez más tiempo a la cocina ¿{Qué} indican los datos?},
-	url = {https://elquantificador.org/post/valores/2022-09-24-uso-del-tiempo-cocina/},
-	abstract = {Edición Julio 2022- Enero 2023
-ISSN 2953-6456
-Introducción En Ecuador y gran parte del mundo existe la generalización de que las mujeres dedican mucho más tiempo a la cocina que los hombres. Para analizar qué ocurre con estas cifras en nuestro país, podemos utilizar las bases de datos del Instituto Nacional de Estadística y Censos (INEC) para contabilizar el tiempo que los hombres y las mujeres dedican a diversas actividades, tales como el tiempo dedicado a cocinar o preparar alimentos[1].},
-	language = {es-es},
-	urldate = {2023-09-29},
-	journal = {El Quantificador},
-	author = {{Christian Salas}},
-	month = sep,
-	year = {2022},
-	note = {Section: post},
-	file = {Snapshot:files/14/2022-09-24-uso-del-tiempo-cocina.html:text/html},
-}
-
-@misc{sebastian_morales_perspectivas_2023,
-	title = {Perspectivas sobre el mercado laboral: ¿donde están los mejores sueldos del país?},
-	shorttitle = {Perspectivas sobre el mercado laboral},
-	url = {https://elquantificador.org/post/economia/2023-09-07-perspectivas-sobre-el-mercado-laboral/},
-	abstract = {Sebastián Morales analiza el mercado laboral ecuatoriano, con una visión exhaustiva sobre las provincias e industrias que más aportan al país.},
-	language = {es-es},
-	urldate = {2023-09-29},
-	journal = {El Quantificador},
-	author = {{Sebastian Morales}},
-	month = sep,
-	year = {2023},
-	note = {Section: post},
-	file = {Snapshot:files/16/2023-09-07-perspectivas-sobre-el-mercado-laboral.html:text/html},
-}
-
-@misc{parker_chapter_2013,
-	title = {Chapter 1: {Changing} {Views} {About} {Work}},
-	shorttitle = {Chapter 1},
-	url = {https://www.pewresearch.org/social-trends/2013/03/14/chapter-1-changing-views-about-work/},
-	abstract = {Much of the change in the way mothers and fathers spend their time has been driven by women’s growing presence in the workplace. And the pressures of},
-	language = {en-US},
-	urldate = {2023-09-29},
-	journal = {Pew Research Center’s Social \& Demographic Trends Project},
-	author = {Parker, Kim},
-	month = mar,
-	year = {2013},
-	file = {Snapshot:files/18/chapter-1-changing-views-about-work.html:text/html},
-}
+# Guarda el archivo Excel
+saveWorkbook(wb, "archivo_combinado.xlsx", overwrite = TRUE)
